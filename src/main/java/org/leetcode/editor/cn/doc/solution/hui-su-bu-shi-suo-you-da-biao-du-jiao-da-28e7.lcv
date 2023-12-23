@@ -1,0 +1,51 @@
+> [2048. 下一个更大的数值平衡数](https://leetcode.cn/problems/next-greater-numerically-balanced-number/description/)
+
+# 吐槽
+
+本并不想写这个题解，这题略显无趣，但是看了官方题解不得不吐槽一下，好歹告诉大家表怎么来是吧？如何非常高级的快速的得到 “表” ，你非要说枚举 n 个数得出，我只能说 6 。直接就源码写表，难道竞赛时、面试时您还能提供这个表给我不成？还是说这种题目枚举前 n 项必然不超时？；
+
+# 打表制表
+
+动态规划当前状态下能否再填入规定数字，例如我要一个长度是 6 的数字，必然就只有这几种组合 1+2+3，2+4，1+5，6，至于这些数字本身如何排列那就需要递归一个个找出来了；
+
+所以做一个递归函数，把当前可能填入的数字都尝试填入并递归下去求解最后答案，每次操作后回溯复位；
+
+时间复杂度主要是取决于最大 n 的长度这题是 6 故 $6^6$ ，即 $O(m^m)$ ；
+查表就是 $logn$ 了
+
+* []
+
+```python
+nums = []
+
+def dfs(n: int, cur: int, queue: List[int], pre: int) -> int:
+    if cur == 0 and n == 0:
+        nums.append(pre)
+        return
+    for num, cnt in enumerate(queue[1:], 1):
+        if cnt == 0: continue
+        if num > cnt:
+            queue[num] -= 1
+            dfs(n, cur - 1, queue, pre * 10 + num)
+            queue[num] += 1
+        else:
+            if num > n: continue
+            queue[num] -= 1
+            dfs(n - num, cur - 1, queue, pre * 10 + num)
+            queue[num] += 1
+
+dfs(1, 1, [0,1], 0)
+dfs(2, 2, [0,1,2], 0)
+dfs(3, 3, [0,1,2,3], 0)
+dfs(4, 4, [0,1,2,3,4], 0)
+dfs(5, 5, [0,1,2,3,4,5], 0)
+dfs(6, 6, [0,1,2,3,4,5,6], 0)
+nums.append(1224444)
+
+class Solution:
+    def nextBeautifulNumber(self, n: int) -> int:
+        # print(nums)
+        i = bisect_right(nums, n)
+        return nums[i]
+```
+
